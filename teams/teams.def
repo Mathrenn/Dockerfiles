@@ -1,0 +1,37 @@
+# Run teams in a singularity container
+#
+# singularity build --fakeroot --tmpdir $SIFDIR $SIFDIR/teams.sif $DEFDIR/teams/teams.def
+#
+# singularity run $SIFDIR/teams.sif
+#
+
+BootStrap: docker
+From: debian:bullseye-slim
+
+%post
+    # Tell debconf to run in non-interactive mode
+    export DEBIAN_FRONTEND=noninteractive
+    
+    apt-get update && apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      sudo \
+      wget \
+      gnupg \
+      procps \
+      libsecret-1-0 \
+      --no-install-recommends
+
+    # Download the teams deb package
+    wget https://packages.microsoft.com/repos/ms-teams/pool/main/t/teams/teams_1.3.00.16851_amd64.deb -O teams.deb
+    # Install teams
+    apt install -yf ./teams.deb --no-install-recommends
+    # Remove old package
+    rm ./teams.deb
+
+%files 
+    $DEFDIR/teams/run-teams-and-wait-for-exit /usr/local/bin
+
+%runscript
+    # Start teams
+    run-teams-and-wait-for-exit

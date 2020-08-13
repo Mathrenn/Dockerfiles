@@ -1,0 +1,37 @@
+# Run discord in a singularity container
+#
+# singularity build --fakeroot --tmpdir=$SIFDIR $SIFDIR/discord.sif $DEFDIR/discord/discord.def
+# singularity run --nv $SIFDIR/discord.sif
+#
+
+BootStrap: docker
+From: debian:bullseye-slim
+
+%post
+    # Tell debconf to run in non-interactive mode
+    export DEBIAN_FRONTEND=noninteractive
+    
+    apt-get update && apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      wget \
+      gnupg \
+      procps \
+      libgconf-2-4 libappindicator1 \
+      libgtk-3-0 libx11-xcb1 \
+      apulse \
+      --no-install-recommends
+
+    # Download the discord deb package
+    wget https://dl.discordapp.net/apps/linux/0.0.11/discord-0.0.11.deb -O /opt/discord.deb
+    # Install discord
+    apt install -yf /opt/discord.deb --no-install-recommends
+    # Remove old package
+    rm /opt/discord.deb
+
+%files
+    $DEFDIR/discord/run-discord-and-wait-for-exit /usr/local/bin
+
+%runscript
+    # Start Discord
+    run-discord-and-wait-for-exit

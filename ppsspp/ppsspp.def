@@ -1,0 +1,24 @@
+# PPSSPP singularity definition file
+#
+# singularity build --tmpdir $PWD $SIFDIR/ppsspp.sif ppsspp.def
+# or
+# singularity build --sandbox --tmpdir $PWD $SIFDIR/ppsspp.sif ppsspp.def
+#
+# singularity run --nv $SIFDIR/ppsspp.sif
+#
+
+BootStrap: docker
+From: debian:sid-slim
+
+%post 
+    apt-get update 
+    apt-get install -y binutils ca-certificates libsdl2-dev libgl1-mesa-dev libgl1-mesa-dri mesa-utils libvulkan1 vulkan-utils unzip wget --no-install-recommends 
+    rm -rf /var/lib/apt/lists/* 
+    ldconfig
+    wget https://build.ppsspp.org/builds/Linux/amd64/ppssppbuildbot-org.ppsspp.ppsspp-dev-latest-linux-amd64.zip -O /opt/ppsspp.zip
+    unzip /opt/ppsspp.zip -d /opt/ppsspp 
+    rm /opt/ppsspp.zip 
+    chmod +x /opt/ppsspp/PPSSPPSDL
+
+%runscript 
+    /opt/ppsspp/PPSSPPSDL

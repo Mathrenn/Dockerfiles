@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
   procps \
   libgconf-2-4 libappindicator1 \
   libgtk-3-0 libx11-xcb1 \
+  apulse \
   --no-install-recommends
 
 # Download the discord deb package

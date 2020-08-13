@@ -2,6 +2,7 @@
 #
 # docker run -v /tmp/.X11-unix:/tmp/.X11-unix \
 #	-e DISPLAY \
+#	-v $HOME/.config/Microsoft:/home/teams/.config/Microsoft \
 #	--device /dev/video0 \
 #       --device /dev/snd \
 #	--name teams \
@@ -34,8 +35,8 @@ COPY run-teams-and-wait-for-exit /usr/local/bin
 
 # Make a user
 ENV HOME /home/teams
-RUN useradd --create-home --home-dir $HOME teams \
-  && chown -R teams:teams $HOME \
+RUN useradd --create-home --home-dir /home/teams teams \
+  && mkdir -p "/home/teams/.config/Microsoft/Microsoft Teams/logs" && chown -R teams:teams /home/teams/ \
   && usermod -a -G audio,video teams
 
 WORKDIR $HOME
