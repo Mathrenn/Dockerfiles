@@ -1,0 +1,32 @@
+# Run eclipse in a singularity container
+#
+# singularity build --fakeroot --sandbox -tmpdir=$SIFDIR $SIFDIR/eclipse.sif $DEFDIR/eclipse/eclipse.sif
+#
+# singularity run $SIFDIR/eclipse.sif
+#
+
+# Base docker image
+BootStrap: docker
+From: openjdk:8-jdk
+
+# Install Dependencies
+%post
+    apt-get update && apt-get install -y \
+    wget \
+    apt-utils \
+    libxext-dev libxrender-dev libxtst-dev \
+    libgtk2.0-0 libcanberra-gtk-module \
+    libswt-gtk-4-java \
+    openjdk-11-jre \
+    git \
+    maven \
+    --no-install-recommends
+
+    # Install eclipse
+    wget http://ftp.halifax.rwth-aachen.de/eclipse//technology/epp/downloads/release/2020-06/R/eclipse-jee-2020-06-R-linux-gtk-x86_64.tar.gz -O /opt/eclipse.tar.gz
+    cd /opt/
+    tar -xzf /opt/eclipse.tar.gz
+    rm /opt/eclipse.tar.gz
+
+%runscript 
+    /opt/eclipse/eclipse
