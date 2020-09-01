@@ -1,0 +1,45 @@
+# Run postman in a singularity container
+#
+# singularity build --fakeroot --tmpdir=$SIFDIR $SIFDIR/postman.sif $DEFDIR/postman/postman.def
+# singularity run --nv $SIFDIR/postman.sif
+#
+
+BootStrap: docker
+From: debian:bullseye-slim
+
+%post
+    # Tell debconf to run in non-interactive mode
+    export DEBIAN_FRONTEND=noninteractive
+    
+    apt-get update && apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      wget \
+      gnupg \
+      procps \
+      libgconf-2-4 libappindicator1 \
+      libgtk-3-0 \
+      libglib2.0-0 \
+      libgdk-pixbuf2.0-0 \
+      libx11-xcb1 \
+      libx11-6 \
+      libxcomposite1 \
+      libxcursor1 \
+      libxdamage1 \
+      libxext6 \
+      libxi6 \
+      libxtst6 \
+      libnss3 \
+      libxss1 \
+      libasound2 \
+      --no-install-recommends
+    rm -rf /var/lib/apt/lists/* 
+
+    wget https://dl.pstmn.io/download/latest/linux64 -O /opt/postman.tar.gz
+    cd /opt/
+    tar -xzf /opt/postman.tar.gz
+    rm /opt/postman.tar.gz
+    chmod +x /opt/Postman/app/Postman
+
+%runscript 
+    /opt/Postman/app/Postman
