@@ -1,0 +1,20 @@
+# PPSSPP singularity definition file
+#
+# singularity build --tmpdir $PWD $SIFDIR/ppsspp.sif ppsspp.def
+# or
+# singularity build --sandbox --tmpdir $PWD $SIFDIR/ppsspp.sif ppsspp.def
+#
+# singularity run --nv $SIFDIR/ppsspp.sif
+#
+
+BootStrap: docker
+From: debian:sid-slim
+
+%post 
+    apt-get update 
+    apt-get install -y telegram-desktop --no-install-recommends 
+    rm -rf /var/lib/apt/lists/* 
+    ldconfig
+
+%runscript 
+    telegram-desktop
