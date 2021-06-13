@@ -1,0 +1,32 @@
+# Run chromium in a singularity container
+#
+# singularity build --fakeroot --tmpdir=$SIFDIR $SIFDIR/chromium.sif $DEFDIR/chromium/chromium.def
+# singularity run --nv $SIFDIR/chromium.sif
+#
+
+BootStrap: docker
+From: debian:sid-slim
+
+%post
+    # Tell debconf to run in non-interactive mode
+    export DEBIAN_FRONTEND=noninteractive
+    
+    apt-get update && apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      gnupg \
+      procps \
+      libgconf-2-4 libappindicator1 \
+      libgtk-3-0 libx11-xcb1 \
+      apulse \
+      --no-install-recommends
+
+    echo 'deb http://download.opensuse.org/repositories/home:/ungoogled_chromium/Debian_Sid/ /' | sudo tee /etc/apt/sources.list.d/home-ungoogled_chromium.list > /dev/null
+    curl -s 'https://download.opensuse.org/repositories/home:/ungoogled_chromium/Debian_Sid/Release.key' | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home-ungoogled_chromium.gpg > /dev/null
+    apt update
+    apt install -y ungoogled-chromium ungoogled-chromium-driver ungoogled-chromium-l10n ungoogled-chromium-sandbox ungoogled-chromium-shell
+
+%runscript
+    # Start chromium
+    ungoogled-chromium
